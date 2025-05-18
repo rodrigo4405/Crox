@@ -11,16 +11,14 @@
 bool hadError = false;
 
 // Error Handling
-
 static void report(const int line, const std::string& where, const std::string& message) {
     std::cerr << "[Line " << line << "] Error" << where << ": " << message;
 
     hadError = true;
 }
-namespace Lox {
-    void error(const int line, const std::string& message) {
-        report(line, "", message);
-    }
+
+void Lox::error(const int line, const std::string& message) {
+    report(line, "", message);
 }
 
 static void run(const std::string& source) {
@@ -36,7 +34,6 @@ static void run(const std::string& source) {
 static void runFile(const std::string& path) {
     std::ifstream file {path};
 
-    // File was not opened successfully
     if (!file) {
         std::cerr << "Could not open file: " + path;
     }
@@ -67,7 +64,7 @@ static void runPrompt() {
     }
 } 
 
-int main(int argc, char* argv[]) {
+int main(int argc, char** argv) {
     if (argc > 2) {
         std::cerr << "\
         Usage: crox <script>\

@@ -5,7 +5,7 @@
 #include <string>
 #include <any>
 class Token {
-    private:
+    public:
         TokenType type;
         std::string lexeme;
         std::any literal;
@@ -64,7 +64,6 @@ class Token {
             }
         }
 
-    public:
         Token(){} // default constructor for Expr.hpp
 
         Token(TokenType type, std::string lexeme, std::any literal, int line) {

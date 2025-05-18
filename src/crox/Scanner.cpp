@@ -103,7 +103,6 @@ namespace Lox {
         addToken(type);
     }
 
-    // addToken is overloaded :)
     void Scanner::addToken(TokenType type, std::any literal) {
         std::string text = source.substr(start, current - start);
 
@@ -172,9 +171,6 @@ namespace Lox {
                         advance();
                         advance();
                     }
-
-                    // error when comment block is not terminated
-                    if (comDepth > 0) error(line, "Unterminated comment block.");
                 }
                 else addToken(SLASH);
 
