@@ -3,50 +3,77 @@
 #include <vector>
 #include <any>
 
-#include "..\Token.hpp"
+#include "Token.hpp"
+
+class Visitor {
+public:
+    virtual void visitBinary(const Binary* expr) const = 0;
+    virtual void visitGrouping(const Grouping* expr) const = 0;
+    virtual void visitLiteral(const Literal* expr) const = 0;
+    virtual void visitUnary(const Unary* expr) const = 0;
+};
 
 class Expr {
+public:
+    Expr() {};
+    virtual void accept (Visitor* visitor) const = 0;
 };
 
 
 class Binary : public Expr {
-    public:
-        Expr left;
-        Token oper;
-        Expr right;
+public:
+    virtual void accept(Visitor* visitor) const override {
+        visitor->visitBinary(this);
+    }
 
-        Binary(Expr left,Token oper,Expr right) {
-            this->left = left;
-            this->oper = oper;
-            this->right = right;
-        }
+    Expr* left;
+    Token oper;
+    Expr* right;
+
+    Binary(Expr* left,Token oper,Expr* right) {
+        this->left = left;
+        this->oper = oper;
+        this->right = right;
+    }
 };
 
 class Grouping : public Expr {
-    public:
-        Expr expression;
+public:
+    virtual void accept(Visitor* visitor) const override {
+        visitor->visitGrouping(this);
+    }
 
-        Grouping(Expr expression) {
-            this->expression = expression;
-        }
+    Expr* expression;
+
+    Grouping(Expr* expression) {
+        this->expression = expression;
+    }
 };
 
 class Literal : public Expr {
-    public:
-        std::any value;
+public:
+    virtual void accept(Visitor* visitor) const override {
+        visitor->visitLiteral(this);
+    }
 
-        Literal(std::any value) {
-            this->value = value;
-        }
+    std::any value;
+
+    Literal(std::any value) {
+        this->value = value;
+    }
 };
 
 class Unary : public Expr {
-    public:
-        Token oper;
-        Expr right;
+public:
+    virtual void accept(Visitor* visitor) const override {
+        visitor->visitUnary(this);
+    }
 
-        Unary(Token oper,Expr right) {
-            this->oper = oper;
-            this->right = right;
-        }
+    Token oper;
+    Expr* right;
+
+    Unary(Token oper,Expr* right) {
+        this->oper = oper;
+        this->right = right;
+    }
 };

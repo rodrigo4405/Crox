@@ -2,9 +2,7 @@
 
 #include "Crox.hpp"
 #include "Scanner.hpp"
-#include "Token.hpp"
 
-#include <iostream>
 #include <vector>
 #include <fstream>
 
@@ -19,6 +17,15 @@ static void report(const int line, const std::string& where, const std::string& 
 
 void Lox::error(const int line, const std::string& message) {
     report(line, "", message);
+}
+
+void Lox::error(Token token, const std::string& message) {
+    if (token.type == EOF_) {
+        report(token.line, " at end", message);
+    }
+    else {
+        report(token.line, " at \"" + token.lexeme + "\"", message);
+    }
 }
 
 static void run(const std::string& source) {

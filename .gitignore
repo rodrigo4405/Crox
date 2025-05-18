@@ -2,3 +2,4 @@
 *.txt
 *.ps1
 settings.json
+*.hs

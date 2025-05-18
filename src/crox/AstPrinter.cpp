@@ -7,9 +7,9 @@
 #include <iostream>
 #include <memory>
 
+// EXAMPLE
+
 int main() {
-    // Create basic Binary Expression
-    //bool f = false;
     auto Expression = std::make_unique<Binary>(
         new Literal(5),
         Token(MINUS, "-", nullptr, 1),
