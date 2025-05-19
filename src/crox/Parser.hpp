@@ -7,20 +7,15 @@
 #include <vector>
 
 class ParseError : public std::runtime_error {
-private:
-    std::string message;
-
 public:
-    ParseError(const std::string& message, int line) : std::runtime_error(message) {
-        this->message = "[Line " + std::to_string(line) + "] " +  "Parsing Error: " + message;
-    }
+    ParseError(const std::string& message, int line) : std::runtime_error(message) {}
 };
 
 class Parser {
 private:
 
-    std::vector<Token> Tokens;
-    int current = 0;
+    std::vector<Token> tokens;
+    size_t current = 0;
 
     bool isAtEnd();
     Token peek();
@@ -29,6 +24,7 @@ private:
     bool check(TokenType type);
     bool match(std::vector<TokenType> tokens);
 
+    Expr* ternary();
     Expr* expr();
     Expr* equality();
     Expr* comparison();
@@ -38,12 +34,14 @@ private:
     Expr* primary();
 
     Token consume(TokenType type, const std::string& message);
-
     ParseError* error(Token token, const std::string& message);
+    void synchronize();
 
 public:
     Parser(std::vector<Token>& tokens) {
-        this->Tokens = Tokens;
+        this->tokens = tokens;
     }
+
+    Expr* parse();
 
 };

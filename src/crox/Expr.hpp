@@ -7,6 +7,7 @@
 
 
 class Binary;
+class Ternary;
 class Grouping;
 class Literal;
 class Unary;
@@ -14,6 +15,7 @@ class Unary;
 class Visitor {
 public:
     virtual std::any visit(const Binary& expr) const = 0;
+    virtual std::any visit(const Ternary& expr) const = 0;
     virtual std::any visit(const Grouping& expr) const = 0;
     virtual std::any visit(const Literal& expr) const = 0;
     virtual std::any visit(const Unary& expr) const = 0;
@@ -40,6 +42,23 @@ public:
         this->left = left;
         this->oper = oper;
         this->right = right;
+    }
+};
+
+class Ternary : public Expr {
+public:
+    virtual std::any accept(const Visitor& visitor) const override {
+        return visitor.visit(*this);
+    }
+
+    Expr* condition;
+    Expr* thenExpr;
+    Expr* elseExpr;
+
+    Ternary(Expr* condition, Expr* thenExpr, Expr* elseExpr) {
+        this->condition = condition;
+        this->thenExpr = thenExpr;
+        this->elseExpr = elseExpr;
     }
 };
 

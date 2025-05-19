@@ -2,6 +2,8 @@
 
 #include "Crox.hpp"
 #include "Scanner.hpp"
+#include "Parser.hpp"
+#include "AstPrinter.hpp"
 
 #include <vector>
 #include <fstream>
@@ -29,12 +31,24 @@ void Lox::error(Token token, const std::string& message) {
 }
 
 static void run(const std::string& source) {
+    // Scanning
     Scanner scanner = Scanner(source);
     std::vector<Token> tokens = scanner.scanTokens();
+
+    // Parsing
+    Parser parser = Parser(tokens);
+    Expr* expr = parser.parse();
+
+    if (hadError) return;
 
     for (Token token: tokens) {
         std::cout << token.toString();
     }
+
+
+    AstPrinter printer = AstPrinter();
+
+    std::cout << printer.print(expr);
 }
 
 // Run a script

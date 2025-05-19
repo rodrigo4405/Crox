@@ -1,11 +1,23 @@
 #include "Parser.hpp"
 
+Expr* Parser::parse() {
+    try {
+        return ternary();
+    } catch (ParseError err) {
+        return nullptr;
+    }
+}
+
 Token Parser::peek() {
-    return Tokens.at(current);
+    try {
+        return tokens.at(current);
+    } catch (std::out_of_range& e) {
+        return tokens.back();
+    }
 }
 
 Token Parser::previous() {
-    return Tokens.at(current - 1);
+    return tokens.at(current - 1);
 }
 
 bool Parser::isAtEnd() {
@@ -33,6 +45,20 @@ bool Parser::match(std::vector<TokenType> tokens) {
     }
 
     return false;
+}
+
+Expr* Parser::ternary() {
+    Expr* expression = expr();
+
+    if (match({QUESTION})) {
+        Expr* thenExpr = expr();
+        consume(COLON, "Expected \":\" on ternary branch.");
+        Expr* elseExpr = expr();
+
+        expression = new Ternary(expression, thenExpr, elseExpr);
+    }
+
+    return expression;
 }
 
 Expr* Parser::expr() {
@@ -117,6 +143,8 @@ Expr* Parser::primary() {
         consume(RIGHT_PAREN, msg);
         return new Grouping(expression);
     }
+
+    throw error(peek(), "Expected expression.");
 }
 
 Token Parser::consume(TokenType type, const std::string& message) {
@@ -129,4 +157,26 @@ ParseError* Parser::error(Token token, const std::string& message) {
     Lox::error(token, message);
 
     return new ParseError(message, token.line);
+}
+
+void Parser::synchronize() {
+    advance();
+
+    while (!isAtEnd()) {
+        if (previous().type == SEMICOLON) return;
+
+        switch (peek().type) {
+            case CLASS:
+            case FUN:
+            case VAR:
+            case FOR:
+            case IF:
+            case WHILE:
+            case PRINT:
+            case RETURN:
+                return;
+        }
+
+        advance();
+    }
 }

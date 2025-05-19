@@ -1,4 +1,7 @@
-expression -> equality ;
+ternary -> expression "?" expression ":" ternary 
+            | expression;
+
+expression -> equality ; 
 equality -> comparison ( ( "!=" | "==" ) comparison )* ;
 comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term -> factor ( ( "-" | "+" ) factor )* ;
@@ -8,3 +11,6 @@ unary -> ( "!" | "-" ) unary
         
 primary -> NUMBER | STRING | "true" | "false" | "nil"
         | "(" expression ")" ;
+
+(*   Error productions      *)
+

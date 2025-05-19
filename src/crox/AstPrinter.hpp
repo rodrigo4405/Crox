@@ -9,7 +9,7 @@
 
 class AstPrinter : public Visitor {
 private:
-    std::string parenthesize(std::string name, std::vector<Expr*> exprs) const {
+    std::string parenthesize(const std::string& name, std::vector<Expr*> exprs) const {
         std::ostringstream buffer;
         
         buffer << "(" + name;
@@ -37,6 +37,10 @@ public:
     std::any visit(const Binary& expr) const override {
         return parenthesize(expr.oper.lexeme, {expr.left, expr.right});
     };
+
+    std::any visit(const Ternary& expr) const override {
+        return parenthesize("ternary", {expr.condition, expr.elseExpr, expr.thenExpr});
+    }
 
     std::any visit(const Grouping& expr) const override {
         return parenthesize("group", {expr.expression});

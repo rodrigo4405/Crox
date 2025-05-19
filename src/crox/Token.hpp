@@ -22,9 +22,11 @@ class Token {
                 case DOT: return "DOT";
                 case MINUS: return "MINUS";
                 case PLUS: return "PLUS";
+                case COLON: return "COLON";
                 case SEMICOLON: return "SEMICOLON";
                 case SLASH: return "SLASH";
                 case STAR: return "STAR";
+                case QUESTION: return "QUESTION";
 
                 // One or two character tokens
                 case BANG: return "BANG";

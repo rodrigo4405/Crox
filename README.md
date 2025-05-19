@@ -13,9 +13,12 @@ A simple dynamically typed and object-oriented language.
  ## Extras
 <br />
 
- - <code>/* comment */</code> Comment Block. Supports nested blocks.
+ - <code>/* comment */</code><span style="opacity:0">...</span>Comment Block. Supports nested blocks.
+ - Ternary operator.
 
 <br />
 
 ### In the future
-- <code>%</code> Modulo Operator.
+- <code>%</code><span style="opacity:0">...</span>Modulo Operator.
+- <code>**</code><span style="opacity:0">...</span>Exponent Operator.
+- <code>++/--</code><span style="opacity:0">...</span> Increment/Decrement operators.
