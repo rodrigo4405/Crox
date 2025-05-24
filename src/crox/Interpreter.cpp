@@ -21,6 +21,18 @@ bool Interpreter::isInteger(const std::string& text) {
     return true;
 }
 
+int Interpreter::strcmp(const std::string& str1, const std::string& str2) {
+    size_t r = (str1.length() < str2.length()) ? str1.length() : str2.length();
+    int s1{},s2{};
+
+    for (size_t i = 0; i < r; i++) {
+        s1+=(int) str1.at(i);
+        s2+=(int) str2.at(i);
+    }
+
+    return s1-s2;
+}
+
 std::string Interpreter::stringify(std::any obj) {
     if (!obj.has_value()) return "NULL";
 
@@ -107,11 +119,18 @@ std::any Interpreter::visit(Binary& expr) {
             if (left.type() == typeid(double) && right.type() == typeid(double)) {
                 return std::any_cast<double>(left) + std::any_cast<double>(right);
             }
-            if (left.type() == typeid(std::string) && right.type() == typeid(std::string)) {
-                return std::any_cast<std::string>(left) + std::any_cast<std::string>(right);
+            if (left.type() == typeid(std::string)) {
+                std::string strLeft = std::any_cast<std::string>(left);
+
+                if (right.type() == typeid(double)) {
+                    std::string strRight = std::to_string(std::any_cast<double>(right));
+                    if (!isInteger(strRight)) return strLeft + strRight;
+
+                    return strLeft + strRight.substr(0, strRight.find('.'));
+                }
             }
 
-            throw LoxError::RuntimeError(expr.oper, "Operands must be two numbers or two strings.");
+            throw LoxError::RuntimeError(expr.oper, "Operands must be two numbers or start with a string.");
 
         case SLASH:
             checkNumberOperand(expr.oper, left, right);
@@ -130,17 +149,33 @@ std::any Interpreter::visit(Binary& expr) {
             return std::any_cast<double>(left) - std::any_cast<double>(right);
 
         case GREATER:
-            checkNumberOperand(expr.oper, left, right);
-            return std::any_cast<double>(left) > std::any_cast<double>(right);
+            if (left.type() != typeid(std::string) && right.type() != typeid(std::string)) {
+                checkNumberOperand(expr.oper, left, right);
+                return std::any_cast<double>(left) > std::any_cast<double>(right);
+            }
+
+            return strcmp(std::any_cast<std::string>(left), std::any_cast<std::string>(right)) > 0;
         case GREATER_EQUAL:
-            checkNumberOperand(expr.oper, left, right);
-            return std::any_cast<double>(left) >= std::any_cast<double>(right);
+            if (left.type() != typeid(std::string) && right.type() != typeid(std::string)) {
+                checkNumberOperand(expr.oper, left, right);
+                return std::any_cast<double>(left) >= std::any_cast<double>(right);
+            }
+
+            return strcmp(std::any_cast<std::string>(left), std::any_cast<std::string>(right)) >= 0;
         case LESS:
-            checkNumberOperand(expr.oper, left, right);
-            return std::any_cast<double>(left) < std::any_cast<double>(right);
+            if (left.type() != typeid(std::string) && right.type() != typeid(std::string)) {
+                checkNumberOperand(expr.oper, left, right);
+                return std::any_cast<double>(left) < std::any_cast<double>(right);
+            }
+
+            return strcmp(std::any_cast<std::string>(left), std::any_cast<std::string>(right)) < 0;
         case LESS_EQUAL:
-            checkNumberOperand(expr.oper, left, right);
-            return std::any_cast<double>(left) <= std::any_cast<double>(right);
+            if (left.type() != typeid(std::string) && right.type() != typeid(std::string)) {
+                checkNumberOperand(expr.oper, left, right);
+                return std::any_cast<double>(left) <= std::any_cast<double>(right);
+            }
+
+            return strcmp(std::any_cast<std::string>(left), std::any_cast<std::string>(right)) <= 0;
         
         case EQUAL_EQUAL: return isEqual(left, right);
         case BANG_EQUAL: return isEqual(left, right);

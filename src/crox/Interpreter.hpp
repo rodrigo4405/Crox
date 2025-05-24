@@ -8,6 +8,7 @@
 class Interpreter : public Visitor {
 private:
     bool isInteger(const std::string& text);
+    int strcmp(const std::string& str1, const std::string& str2);
     std::string stringify(std::any obj);
     std::any evaluate(Expr* expr);
     bool truthValue(std::any obj);

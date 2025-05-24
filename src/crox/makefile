@@ -1,5 +1,5 @@
 CC = clang++
-CFLAGS = -g -Wall -Wextra -Wno-switch
+CFLAGS = -g -Wall -Wextra -Wno-switch -Wno-unused-parameter
 DEBUGFLAGS = -fno-omit-frame-pointer
 
 all:

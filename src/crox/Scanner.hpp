@@ -20,7 +20,7 @@ namespace Lox {
         std::string source;
         std::vector<Token> tokens;
         int start = 0;
-        int current = 0;
+        size_t current = 0;
         int line = 1;
 
         void string();
