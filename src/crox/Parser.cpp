@@ -1,11 +1,13 @@
 #include "Parser.hpp"
 
-Expr* Parser::parse() {
-    try {
-        return ternary();
-    } catch (ParseError err) {
-        return nullptr;
+std::vector<Stmt*> Parser::parse() {
+    std::vector<Stmt*> stmts = {};
+
+    while (!isAtEnd()) {
+        stmts.push_back(stmt());
     }
+
+    return stmts;
 }
 
 Token Parser::peek() {
@@ -47,22 +49,40 @@ bool Parser::match(std::vector<TokenType> tokens) {
     return false;
 }
 
-Expr* Parser::ternary() {
+Stmt* Parser::stmt() {
+    if (match({PRINT})) return printStmt();
+
+    return exprStmt();
+}
+
+Stmt* Parser::printStmt() {
+    Expr* string = expr();
+    consume(SEMICOLON, "Expect \";\" after value.\n");
+    return new Print(string);
+}
+
+Stmt* Parser::exprStmt() {
     Expr* expression = expr();
+    consume(SEMICOLON, "Expect \";\" after value.\n");
+    return new Expression(expression);
+}
+
+Expr* Parser::expr() {
+    return ternary();
+}
+
+Expr* Parser::ternary() {
+    Expr* expression = equality();
 
     if (match({QUESTION})) {
         Expr* thenExpr = expr();
-        consume(COLON, "Expected \":\" on ternary branch.");
+        consume(COLON, "Expected \":\" on ternary branch.\n");
         Expr* elseExpr = expr();
 
         expression = new Ternary(expression, thenExpr, elseExpr, peek());
     }
 
     return expression;
-}
-
-Expr* Parser::expr() {
-    return equality();
 }
 
 Expr* Parser::equality() {
@@ -107,7 +127,7 @@ Expr* Parser::term() {
 Expr* Parser::factor() {
     Expr* expression = unary();
 
-    while (match({STAR, SLASH})) {
+    while (match({STAR, SLASH, STAR_STAR, MODULO})) {
         Token oper = previous();
         Expr* rightExpr = unary();
 

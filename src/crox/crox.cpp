@@ -10,6 +10,9 @@
 #include <vector>
 #include <fstream>
 
+// FLAGS
+const bool PRINT_TOKENS = false;
+
 bool hadError = false;
 bool hadRuntimeError = false;
 
@@ -46,20 +49,22 @@ static void run(const std::string& source) {
 
     // Parsing
     Parser parser = Parser(tokens);
-    Expr* expr = parser.parse();
+    std::vector<Stmt*> stmts = parser.parse();
 
     if (hadError) return;
 
-    for (Token token: tokens) {
-        std::cout << token.toString();
+    if (PRINT_TOKENS) {
+        for (Token token: tokens) {
+            std::cout << token.toString();
+        }
     }
 
-    AstPrinter printer = AstPrinter();
-    std::cout << printer.print(expr);
+    //AstPrinter printer = AstPrinter();
+    //std::cout << printer.print(expr);
 
     // Interpreter
     Interpreter interpreter = Interpreter();
-    interpreter.interpret(expr);
+    interpreter.interpret(stmts);
 }
 
 // Run a script

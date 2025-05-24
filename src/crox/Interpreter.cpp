@@ -4,13 +4,18 @@
 
 #include <cmath>
 
-void Interpreter::interpret(Expr* expr) {
+void Interpreter::interpret(std::vector<Stmt*> stmts) {
     try {
-        std::any value = evaluate(expr);
-        std::cout << stringify(value);
+        for (Stmt* stmt: stmts) {
+            execute(stmt);  
+        }
     } catch (LoxError::RuntimeError& e) {
         Lox::RuntimeError(e);
     }
+}
+
+void Interpreter::execute(Stmt* stmt) {
+    stmt->accept(*this);
 }
 
 bool Interpreter::isInteger(const std::string& text) {
@@ -94,17 +99,8 @@ std::any Interpreter::visit(Unary& expr) {
     std::any right = evaluate(expr.right);
 
     switch (expr.oper.type) {
-        case MINUS:
-            try {
-                checkNumberOperand(expr.oper, expr.right);
-                return -(std::any_cast<double>(right));
-            } catch (std::bad_any_cast) {
-                std::cerr << "todo: bad_any_cast => Interpreter::visit(Unary)\n";
-                return NULL;
-            }
-
-        case BANG:
-            return !truthValue(right);
+        case MINUS: return -(std::any_cast<double>(right));
+        case BANG: return !truthValue(right);
     }
 
     return NULL;
@@ -131,7 +127,6 @@ std::any Interpreter::visit(Binary& expr) {
             }
 
             throw LoxError::RuntimeError(expr.oper, "Operands must be two numbers or start with a string.");
-
         case SLASH:
             checkNumberOperand(expr.oper, left, right);
 
@@ -144,6 +139,8 @@ std::any Interpreter::visit(Binary& expr) {
         case STAR:
             checkNumberOperand(expr.oper, left, right);
             return std::any_cast<double>(left) * std::any_cast<double>(right);
+        case STAR_STAR:
+            return pow(std::any_cast<double>(left), std::any_cast<double>(right));
         case MINUS:
             checkNumberOperand(expr.oper, left, right);
             return std::any_cast<double>(left) - std::any_cast<double>(right);
@@ -176,6 +173,9 @@ std::any Interpreter::visit(Binary& expr) {
             }
 
             return strcmp(std::any_cast<std::string>(left), std::any_cast<std::string>(right)) <= 0;
+
+        case MODULO:
+            return fmod(std::any_cast<double>(left), std::any_cast<double>(right));
         
         case EQUAL_EQUAL: return isEqual(left, right);
         case BANG_EQUAL: return isEqual(left, right);
@@ -188,7 +188,6 @@ std::any Interpreter::visit(Ternary& expr) {
     std::any condition = evaluate(expr.condition);
 
     if (condition.type() != typeid(bool)) {
-        std::cout << expr.root.type;
         throw LoxError::RuntimeError(expr.root, "Ternary operator must have a condition.");
     }
 
@@ -199,5 +198,11 @@ std::any Interpreter::visit(Ternary& expr) {
         return evaluate(expr.elseExpr);
     }
 
+    return NULL;
+}
+
+std::any Interpreter::visit(Print& expr) {
+    std::any string = evaluate(expr.expr);
+    std::cout << stringify(string);
     return NULL;
 }

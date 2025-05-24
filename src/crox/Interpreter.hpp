@@ -4,6 +4,7 @@
 
 #include <string>
 #include <any>
+#include <vector>
 
 class Interpreter : public Visitor {
 private:
@@ -16,9 +17,10 @@ private:
     void checkNumberOperand(Token oper, std::any obj);
     void checkNumberOperand(Token oper, std::any obj1, std::any obj2);
 
-public:
-    void interpret(Expr* expr);
+    void execute(Stmt* stmt);
 
+public:
+    void interpret(std::vector<Stmt*> stmts);
 
     std::any visit(Binary& expr) override;
     std::any visit(Ternary& expr) override;
@@ -32,4 +34,11 @@ public:
     }
 
     std::any visit(Unary& expr) override;
+
+    std::any visit(Expression& expr) override {
+        evaluate(expr.expr);
+        return NULL;
+    }
+
+    std::any visit(Print& expr) override;
 };

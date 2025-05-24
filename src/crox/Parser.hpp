@@ -22,8 +22,12 @@ private:
     bool check(TokenType type);
     bool match(std::vector<TokenType> tokens);
 
-    Expr* ternary();
+    Stmt* stmt();
+    Stmt* printStmt();
+    Stmt* exprStmt();
+    
     Expr* expr();
+    Expr* ternary();
     Expr* equality();
     Expr* comparison();
     Expr* term();
@@ -40,6 +44,6 @@ public:
         this->tokens = tokens;
     }
 
-    Expr* parse();
+    std::vector<Stmt*> parse();
 
 };

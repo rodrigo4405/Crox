@@ -79,8 +79,8 @@ namespace Lox {
             while (isdigit(peek())) advance();
 
         if (peek() == '.' && isdigit(peekNext())) {
-            advance(); // consume the '.'
-            goto lookup; // read the rest of the digits
+            advance();
+            goto lookup;
         }
 
         std::string num = source.substr(start, current - start);
@@ -129,10 +129,12 @@ namespace Lox {
             case '+': addToken(PLUS); break;
             case ':': addToken(COLON); break;
             case ';': addToken(SEMICOLON); break;
-            case '*': addToken(STAR); break;
             case '?': addToken(QUESTION); break;
+            case '%': addToken(MODULO); break;
 
-            // two characters
+            case '*': 
+                addToken(match('*') ? STAR_STAR : STAR); 
+                break;
             case '!':  // !=
                 addToken(match('=') ? BANG_EQUAL : BANG);
                 break;
