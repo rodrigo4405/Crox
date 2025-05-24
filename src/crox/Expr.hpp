@@ -14,23 +14,23 @@ class Unary;
 
 class Visitor {
 public:
-    virtual std::any visit(const Binary& expr) const = 0;
-    virtual std::any visit(const Ternary& expr) const = 0;
-    virtual std::any visit(const Grouping& expr) const = 0;
-    virtual std::any visit(const Literal& expr) const = 0;
-    virtual std::any visit(const Unary& expr) const = 0;
+    virtual std::any visit(Binary& expr) = 0;
+    virtual std::any visit(Ternary& expr) = 0;
+    virtual std::any visit(Grouping& expr) = 0;
+    virtual std::any visit(Literal& expr) = 0;
+    virtual std::any visit(Unary& expr) = 0;
 };
 
 class Expr {
 public:
     virtual ~Expr() {};
-    virtual std::any accept (const Visitor& visitor) const = 0;
+    virtual std::any accept (Visitor& visitor) = 0;
 };
 
 
 class Binary : public Expr {
 public:
-    virtual std::any accept(const Visitor& visitor) const override {
+    virtual std::any accept(Visitor& visitor) override {
         return visitor.visit(*this);
     }
 
@@ -47,24 +47,26 @@ public:
 
 class Ternary : public Expr {
 public:
-    virtual std::any accept(const Visitor& visitor) const override {
+    virtual std::any accept(Visitor& visitor) override {
         return visitor.visit(*this);
     }
 
     Expr* condition;
     Expr* thenExpr;
     Expr* elseExpr;
+    Token root; // the ? operator (for error reasons)
 
-    Ternary(Expr* condition, Expr* thenExpr, Expr* elseExpr) {
+    Ternary(Expr* condition, Expr* thenExpr, Expr* elseExpr, Token root) {
         this->condition = condition;
         this->thenExpr = thenExpr;
         this->elseExpr = elseExpr;
+        this->root = root;
     }
 };
 
 class Grouping : public Expr {
 public:
-    virtual std::any accept(const Visitor& visitor) const override {
+    virtual std::any accept(Visitor& visitor) override {
         return visitor.visit(*this);
     }
 
@@ -77,7 +79,7 @@ public:
 
 class Literal : public Expr {
 public:
-    virtual std::any accept(const Visitor& visitor) const override {
+    virtual std::any accept(Visitor& visitor) override {
         return visitor.visit(*this);
     }
 
@@ -90,7 +92,7 @@ public:
 
 class Unary : public Expr {
 public:
-    virtual std::any accept(const Visitor& visitor) const override {
+    virtual std::any accept(Visitor& visitor) override {
         return visitor.visit(*this);
     }
 

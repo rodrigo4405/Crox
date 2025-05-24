@@ -55,7 +55,7 @@ Expr* Parser::ternary() {
         consume(COLON, "Expected \":\" on ternary branch.");
         Expr* elseExpr = expr();
 
-        expression = new Ternary(expression, thenExpr, elseExpr);
+        expression = new Ternary(expression, thenExpr, elseExpr, peek());
     }
 
     return expression;

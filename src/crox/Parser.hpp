@@ -3,13 +3,11 @@
 #include "Token.hpp"
 #include "Expr.hpp"
 #include "Crox.hpp"
+#include "Error.hpp"
+
+using namespace LoxError;
 
 #include <vector>
-
-class ParseError : public std::runtime_error {
-public:
-    ParseError(const std::string& message, int line) : std::runtime_error(message) {}
-};
 
 class Parser {
 private:

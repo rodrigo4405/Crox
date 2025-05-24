@@ -4,11 +4,14 @@
 #include "Scanner.hpp"
 #include "Parser.hpp"
 #include "AstPrinter.hpp"
+#include "Error.hpp"
+#include "Interpreter.hpp"
 
 #include <vector>
 #include <fstream>
 
 bool hadError = false;
+bool hadRuntimeError = false;
 
 // Error Handling
 static void report(const int line, const std::string& where, const std::string& message) {
@@ -19,7 +22,7 @@ static void report(const int line, const std::string& where, const std::string& 
 
 void Lox::error(const int line, const std::string& message) {
     report(line, "", message);
-}
+} 
 
 void Lox::error(Token token, const std::string& message) {
     if (token.type == EOF_) {
@@ -28,6 +31,12 @@ void Lox::error(Token token, const std::string& message) {
     else {
         report(token.line, " at \"" + token.lexeme + "\"", message);
     }
+}
+
+void Lox::RuntimeError(LoxError::RuntimeError& err) {
+    std::cerr << err.what() << "\n[line " << err.token.line << "]";
+    
+    hadRuntimeError = true;
 }
 
 static void run(const std::string& source) {
@@ -45,10 +54,12 @@ static void run(const std::string& source) {
         std::cout << token.toString();
     }
 
-
     AstPrinter printer = AstPrinter();
-
     std::cout << printer.print(expr);
+
+    // Interpreter
+    Interpreter interpreter = Interpreter();
+    interpreter.interpret(expr);
 }
 
 // Run a script
@@ -63,7 +74,8 @@ static void runFile(const std::string& path) {
 
     run(bytes);
 
-    if (hadError) std::exit(65); // EX_DATAERR
+    if (hadError) std::exit(65);
+    if (hadRuntimeError) std::exit(70);
 }
 
 // REPL
